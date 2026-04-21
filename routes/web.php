@@ -1,8 +1,16 @@
 <?php
 
+use App\Http\Controllers\Landlord\ArrearsController;
+use App\Http\Controllers\Landlord\LandlordDashboardController;
+use App\Http\Controllers\Landlord\PaymentController as LandlordPaymentController;
 use App\Http\Controllers\Landlord\PropertyController;
+use App\Http\Controllers\Landlord\ReportController;
+use App\Http\Controllers\Landlord\TenancyController;
+use App\Http\Controllers\Landlord\UnitController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UnitController;
+use App\Http\Controllers\Tenant\PaymentController as TenantPaymentController;
+use App\Http\Controllers\Tenant\PaymentHistoryController;
+use App\Http\Controllers\Tenant\TenantDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,61 +27,68 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth'])->group(function(){
-    Route::middleware('role:landlord')->prefix('landlord')
-    ->name('landlord.')
-    ->group(function(){
+Route::middleware(['auth'])->group(function () {
 
-        Route::get('/dashboard',function(){
-            return view('landlord.dashboard');
-        })->name('dashboard');
+    Route::middleware('role:landlord')
+        ->prefix('landlord')
+        ->name('landlord.')
+        ->group(function () {
 
-       /* Route::get('/properties',function(){
-            return view('landlord.properties');
-        })->name('properties');*/
+            Route::get('/dashboard', [LandlordDashboardController::class, 'index'])
+                ->name('dashboard');
 
-        Route::get('/units',function(){
-            return view('landlord.units');
-        })->name('units');
+            Route::resource('properties', PropertyController::class)
+                ->names('properties');
 
-        Route::get('/tenancies',function(){
-            return view('landlord.tenancies');
-        })->name('tenancies');
+            Route::resource('properties.units', UnitController::class)
+                ->names('properties.units');
 
-        Route::get('/payments',function(){
-            return view('landlord.payments');
-        })->name('payments');
+            Route::resource('tenancies', TenancyController::class)
+                ->names('tenancies');
 
-        Route::get('/reports',function(){
-            return view('landlord.reports');
-        })->name('reports');
+            Route::get('/payments', [LandlordPaymentController::class, 'index'])
+                ->name('payments.index');
 
-        Route::resource('properties',PropertyController::class)->names('properties');
+            Route::get('/arrears', [ArrearsController::class, 'index'])
+                ->name('arrears.index');
 
-        Route::resource('properties.units', UnitController::class);
-    });
+            Route::get('/reports', [ReportController::class, 'index'])
+                ->name('reports.index');
+            Route::get('/reports/payments', [ReportController::class, 'payments'])
+                ->name('reports.payments');
+            Route::get('/reports/payments/export', [ReportController::class, 'exportPayments'])
+                ->name('reports.payments.export');
+            Route::get('/reports/arrears', [ReportController::class, 'arrears'])
+                ->name('reports.arrears');
+            Route::get('/reports/arrears/export', [ReportController::class, 'exportArrears'])
+                ->name('reports.arrears.export');
+            Route::get('/reports/performance', [ReportController::class, 'performance'])
+                ->name('reports.performance');
+            Route::get('/reports/performance/export', [ReportController::class, 'exportPerformance'])
+                ->name('reports.performance.export');
+        });
 
     Route::middleware('role:tenant')
-    ->prefix('tenant')
-    ->name('tenant.')
-    ->group(function(){
-        Route::get('/dashboard',function(){
-            return view('tenant.dashboard');
-        })->name('dashboard');
+        ->prefix('tenant')
+        ->name('tenant.')
+        ->group(function () {
 
-        Route::get('/unit',function(){
-            return view('tenant.unit');
-        })->name('unit');
+            Route::get('/dashboard', [TenantDashboardController::class, 'index'])
+                ->name('dashboard.index');
 
-        Route::get('/payment',function(){
-            return view('tenant.payment');
-        })->name('payment');
+            Route::get('/unit', function () {
+                return view('tenant.unit');
+            })->name('unit');
 
-        Route::get('/pay',function(){
-            return view('tenant.pay');
-        })->name('pay');
-    });
+            Route::post('/pay', [TenantPaymentController::class, 'store'])
+                ->name('payment.store');
 
+            Route::get('/payments', [PaymentHistoryController::class, 'index'])
+                ->name('payments.index');
+
+            Route::get('/payments/receipt/{receipt}', [PaymentHistoryController::class, 'show'])
+                ->name('payments.receipt');
+        });
 });
 
 require __DIR__.'/auth.php';

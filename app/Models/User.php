@@ -36,6 +36,10 @@ class User extends Authenticatable
     public function properties(){
         return $this->hasMany(Property::class,'landlord_id');
     }
+
+    public function tenancies(){
+        return $this->hasMany(Tenancy::class, 'tenant_id');
+    }
     /**
      * Get the attributes that should be cast.
      *

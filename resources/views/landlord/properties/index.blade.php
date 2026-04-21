@@ -8,6 +8,7 @@
     <table class="w-full">
       <thead class="bg-gray-100">
           <tr>
+             <th class="p-3 text-left">#</th>
               <th class="p-3 text-left">Name</th>
               <th class="p-3 text-left">Location</th>
               <th class="p-3 text-left">Actions</th>
@@ -16,6 +17,8 @@
       <tbody>
         @forelse($properties as $property)
             <tr class="border-t">
+                <td class="p-3">
+                    <a href="{{ route('landlord.properties.show',$property) }}" class="bg-green-500 p-2 text-white text-xs rounded-xl">View</a></td>
                 <td class="p-3">{{ $property->name }}</td>
                 <td class="p-3">{{ $property->location }}</td>
                 <td class="p-3 space-x-2">

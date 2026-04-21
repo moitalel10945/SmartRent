@@ -33,7 +33,7 @@ class AuthenticatedSessionController extends Controller
         }
         
         if ($request->user()->role === 'tenant') {
-            return redirect()->route('tenant.dashboard');
+            return redirect()->route('tenant.dashboard.index');
         }
         
         abort(403);
