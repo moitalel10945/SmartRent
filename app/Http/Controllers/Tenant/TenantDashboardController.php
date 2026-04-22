@@ -12,17 +12,28 @@ class TenantDashboardController extends Controller
     ) {}
 
     public function index()
-    {
-        $tenancy = auth()->user()
-            ->tenancies()
-            ->where('active', true)
-            ->with('unit.property')
-            ->first();
+        {
+            $tenancy = auth()->user()
+                ->tenancies()
+                ->where('active', true)
+                ->with('unit.property')
+                ->first();
 
-        $balance = $tenancy
-            ? $this->calculationService->calculate($tenancy)
-            : null;
+            $balance = $tenancy
+                ? $this->calculationService->calculate($tenancy)
+                : null;
 
-        return view('tenant.dashboard', compact('tenancy', 'balance'));
-    }
+            return view('tenant.dashboard', compact('tenancy', 'balance'));
+        }
+
+    public function unit()
+        {
+            $tenancy = auth()->user()
+                ->tenancies()
+                ->where('active', true)
+                ->with('unit.property')
+                ->first();
+
+            return view('tenant.unit', compact('tenancy'));
+        }
 }

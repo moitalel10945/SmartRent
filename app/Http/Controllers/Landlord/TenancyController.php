@@ -32,18 +32,23 @@ class TenancyController extends Controller
     }
 
     public function create()
-    {
-        $tenants = User::where('role', 'tenant')->get();
+        {
+            $tenants = User::where('role', 'tenant')
+                ->whereDoesntHave('tenancies', function ($q) {
+                    $q->where('active', true);
+                })
+                ->get();
 
-        $units = auth()->user()
-            ->properties()
-            ->with('units')
-            ->get()
-            ->pluck('units')
-            ->flatten();
+            $units = auth()->user()
+                ->properties()
+                ->with('units')
+                ->get()
+                ->pluck('units')
+                ->flatten()
+                ->where('status', 'vacant');
 
-        return view('landlord.tenancies.create', compact('tenants', 'units'));
-    }
+            return view('landlord.tenancies.create', compact('tenants', 'units'));
+        }
 
     public function store(StoreTenancyRequest $request)
     {

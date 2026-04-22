@@ -6,6 +6,7 @@ use App\Http\Controllers\Landlord\PaymentController as LandlordPaymentController
 use App\Http\Controllers\Landlord\PropertyController;
 use App\Http\Controllers\Landlord\ReportController;
 use App\Http\Controllers\Landlord\TenancyController;
+use App\Http\Controllers\Landlord\TenantController;
 use App\Http\Controllers\Landlord\UnitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Tenant\PaymentController as TenantPaymentController;
@@ -66,6 +67,9 @@ Route::middleware(['auth'])->group(function () {
                 ->name('reports.performance');
             Route::get('/reports/performance/export', [ReportController::class, 'exportPerformance'])
                 ->name('reports.performance.export');
+            Route::get('/tenants', [TenantController::class, 'index'])->name('tenants.index');
+            Route::get('/tenants/create', [TenantController::class, 'create'])->name('tenants.create');
+            Route::post('/tenants', [TenantController::class, 'store'])->name('tenants.store');
         });
 
     Route::middleware('role:tenant')
@@ -76,9 +80,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard', [TenantDashboardController::class, 'index'])
                 ->name('dashboard.index');
 
-            Route::get('/unit', function () {
-                return view('tenant.unit');
-            })->name('unit');
+            Route::get('/unit', [TenantDashboardController::class, 'unit'])
+                ->name('unit');
 
             Route::post('/pay', [TenantPaymentController::class, 'store'])
                 ->name('payment.store');
